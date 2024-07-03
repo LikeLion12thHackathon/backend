@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "djangotemplate"
+version = "0.1.0"
+description = ""
+authors = ["mimijae <qzqzcaraz00@gmail.com>"]
+license = "MIT"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+django = "^5.0.2"
+django-cors-headers = "^4.3.1"
+djangorestframework = "^3.14.0"
+drf-yasg = "^1.21.7"
+djangorestframework-simplejwt = "^5.3.1"
+psycopg2 = "^2.9.9"
+gunicorn = "^21.2.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
