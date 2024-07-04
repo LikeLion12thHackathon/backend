@@ -5,6 +5,8 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from config.enum.error_code import ErrorCode
+from config.enum.success_code import SuccessCode
 from users.models import User
 from . import serializers
 from rest_framework_simplejwt.views import TokenRefreshView
@@ -30,12 +32,10 @@ class Register(APIView):
     def post(self, request):
         password = request.data.get("password")
         if not password:
-            raise ValidationError("비밀번호가 필요합니다.")
+            raise ValidationError(ErrorCode.COMMON_010.message)
 
         serializer = serializers.PrivateUserSerializer(data=request.data)
-        if serializer.is_valid(
-            raise_exception=True
-        ):  # raise_exception 옵션을 True로 설정, raise_exception 옵션을 사용하면, 시리얼라이저의 유효성 검사가 실패할 때 ValidationError 예외가 자동으로 발생
+        if serializer.is_valid(raise_exception=True):
             user = serializer.save()
             user.set_password(password)
             user.save()
@@ -47,15 +47,22 @@ class Register(APIView):
 
             # 응답에 JWT 토큰 추가 및 쿠키에 저장
             res = APIResponse.success(
-                data=serializer.data,
-                access_token=access_token,
-                refresh_token=refresh_token,
-                message="회원가입에 성공하였습니다.",
+                code=SuccessCode.SUCCESS_005.code,
+                data={
+                    "user": serializer.data,
+                    "token":{                    
+                    "grantType": "Bearer",
+                    "accessToken": access_token,
+                    "refreshToken": refresh_token,
+                    }
+                },
+                message=SuccessCode.SUCCESS_005.message,
                 status=status.HTTP_201_CREATED,
             )
             res.set_cookie("access", access_token, httponly=True)
             res.set_cookie("refresh", refresh_token, httponly=True)
             return res
+
 
 
 class ChangePassword(APIView):
@@ -67,13 +74,14 @@ class ChangePassword(APIView):
         old_password = request.data.get("old_password")
         new_password = request.data.get("new_password")
         if not old_password or not new_password:
-            raise ValidationError("이전 비밀번호와 새 비밀번호가 필요합니다.")
+            raise ValidationError(ErrorCode.COMMON_010.message)
         if user.check_password(old_password):
             user.set_password(new_password)
             user.save()
-            return APIResponse.success(message="비밀번호가 변경되었습니다.")
+            return APIResponse.success(message=SuccessCode.SUCCESS_003.message)
         else:
-            raise ValidationError("이전 비밀번호가 올바르지 않습니다.")
+            raise ValidationError(ErrorCode.USER_002.message)
+
 
 
 class LogIn(APIView):
@@ -82,7 +90,7 @@ class LogIn(APIView):
         username = request.data.get("username")
         password = request.data.get("password")
         if not username or not password:
-            raise ValidationError("사용자 이름과 비밀번호가 필요합니다.")
+            raise ValidationError(ErrorCode.COMMON_010.message)
 
         user = authenticate(
             request,
@@ -96,10 +104,16 @@ class LogIn(APIView):
             access_token = str(token.access_token)
 
             res = APIResponse.success(
-                data=serializer.data,
-                access_token=access_token,
-                refresh_token=refresh_token,
-                message="로그인에 성공하였습니다.",
+                code=SuccessCode.SUCCESS_006.code,
+                data={
+                    "user": serializer.data,
+                    "token":{                    
+                    "grantType": "Bearer",
+                    "accessToken": access_token,
+                    "refreshToken": refresh_token,
+                    }
+                },
+                message=SuccessCode.SUCCESS_006.message,
                 status=status.HTTP_200_OK,
             )
 
@@ -109,7 +123,8 @@ class LogIn(APIView):
 
             return res
         else:
-            raise AuthenticationFailed("사용자 이름 또는 비밀번호가 올바르지 않습니다.")
+            raise AuthenticationFailed(ErrorCode.USER_002.message)
+
 
 
 class LogOut(APIView):
@@ -118,10 +133,11 @@ class LogOut(APIView):
     @log_out_schema
     def post(self, request):
         # 쿠키에 저장된 토큰 삭제 => 로그아웃 처리
-        response = APIResponse.success(message="로그아웃에 성공하였습니다.")
+        response = APIResponse.success(message=SuccessCode.SUCCESS_008.message)
         response.delete_cookie("access")
         response.delete_cookie("refresh")
         return response
+
 
 
 class PublicUser(APIView):
@@ -130,13 +146,14 @@ class PublicUser(APIView):
         try:
             user = User.objects.get(username=username)
         except User.DoesNotExist:
-            raise NotFound("사용자가 존재하지 않습니다.")
+            raise NotFound(ErrorCode.USER_001.message)
         serializer = serializers.TinyUserSerializer(user)
         return APIResponse.success(
             data=serializer.data,
-            message="사용자 정보를 조회하였습니다.",
+            message=SuccessCode.SUCCESS_002.message,
             status=status.HTTP_200_OK,
         )
+
 
 
 class PersonalProfile(APIView):
@@ -148,7 +165,7 @@ class PersonalProfile(APIView):
         serializer = serializers.PrivateUserSerializer(user)
         return APIResponse.success(
             data=serializer.data,
-            message="사용자 정보를 조회하였습니다.",
+            message=SuccessCode.SUCCESS_002.message,
             status=status.HTTP_200_OK,
         )
 
@@ -165,9 +182,10 @@ class PersonalProfile(APIView):
             serializer = serializers.PrivateUserSerializer(user)
             return APIResponse.success(
                 data=serializer.data,
-                message="사용자 정보를 수정하였습니다.",
+                message=SuccessCode.SUCCESS_003.message,
                 status=status.HTTP_200_OK,
             )
+
 
 
 class TokenRefreshAPIView(TokenRefreshView):
@@ -175,7 +193,15 @@ class TokenRefreshAPIView(TokenRefreshView):
     def post(self, request, *args, **kwargs):
         try:
             # Refresh Token을 사용하여 Access Token 갱신
-            response = super().post(request, *args, **kwargs)
-            return response
+            original_response = super().post(request, *args, **kwargs)
+            response_data = original_response.data
+
+            return APIResponse.success(
+                code=SuccessCode.SUCCESS_007.code,
+                data=response_data,
+                message=SuccessCode.SUCCESS_007.message,
+                status=status.HTTP_201_CREATED,
+            )
         except TokenError as e:
             raise InvalidToken(e.args[0])
+
