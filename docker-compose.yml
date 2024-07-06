@@ -6,7 +6,7 @@ services:
     volumes:
       - static_volume:/usr/src/app/_static
     ports:
-      - 80:80
+      - 10000:10000
     depends_on:
       - web
   web:

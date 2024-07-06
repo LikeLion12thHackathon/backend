@@ -124,7 +124,7 @@ CORS_ALLOW_HEADERS = (
 )
 
 # CSRF 설정
-CSRF_TRUSTED_ORIGINS = ['http://3.34.227.3:80']
+CSRF_TRUSTED_ORIGINS = ['http://3.34.227.3:10000',]
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
