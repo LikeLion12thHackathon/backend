@@ -98,7 +98,7 @@ WSGI_APPLICATION = "config.wsgi.application"
 CORS_ALLOW_CREDENTIALS = True
 
 # 허용할 도메인 리스트
-CORS_ORIGIN_WHITELIST = ["https://127.0.0.1:3000", "http://127.0.0.1:3000","http://3.34.227.3:11000",]
+CORS_ORIGIN_WHITELIST = ["https://127.0.0.1:3000", "http://127.0.0.1:3000","http://3.34.227.3:10000",]
 
 # 실제 요청에 허용되는 HTTP 동사 리스트
 CORS_ALLOW_METHODS = (
@@ -124,7 +124,7 @@ CORS_ALLOW_HEADERS = (
 )
 
 # CSRF 설정
-CSRF_TRUSTED_ORIGINS = ["http://3.34.227.3:11000",]
+CSRF_TRUSTED_ORIGINS = ["http://3.34.227.3:10000",]
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
