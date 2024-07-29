@@ -24,6 +24,10 @@ class ErrorCode(Enum):
     USER_001 = ("PUSER-001", "없는 유저 입니다.")
     USER_002 = ("PUSER-002", "비밀번호가 틀렸습니다.")
 
+    # Question Errors
+    QUESTION_001 = ("QUESTION-001", "질문이 없습니다.")
+
+
     # JWT Errors
     INVALID_TOKEN = ("INVALID_TOKEN", "유효하지 않은 JWT 토큰.")
     EXPIRED_TOKEN = ("EXPIRED_TOKEN", "만료된 JWT 토큰.")

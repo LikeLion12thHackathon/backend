@@ -7,7 +7,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from config.enum.error_code import ErrorCode
 from config.enum.success_code import SuccessCode
-from users.models import User
 from . import serializers
 from rest_framework_simplejwt.views import TokenRefreshView
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
@@ -138,21 +137,6 @@ class LogOut(APIView):
         response.delete_cookie("refresh")
         return response
 
-
-
-class PublicUser(APIView):
-    @public_user_schema
-    def get(self, request, username):
-        try:
-            user = User.objects.get(username=username)
-        except User.DoesNotExist:
-            raise NotFound(ErrorCode.USER_001.message)
-        serializer = serializers.TinyUserSerializer(user)
-        return APIResponse.success(
-            data=serializer.data,
-            message=SuccessCode.SUCCESS_002.message,
-            status=status.HTTP_200_OK,
-        )
 
 
 

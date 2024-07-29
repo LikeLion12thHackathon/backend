@@ -21,6 +21,7 @@ class User(AbstractUser):
 
     avatar = models.URLField(
         blank=True,
+        null=True,
     )
     name = models.CharField(
         max_length=150,

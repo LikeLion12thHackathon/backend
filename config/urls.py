@@ -22,7 +22,8 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path("admin/", admin.site.urls),  # 어드민 페이지 URL
-    path("api/v1/users/", include("users.urls")),  # users 앱의 URL
+    path("api/v1/auth/", include("users.urls")),  # auth 앱의 URL
+    path("api/v1/questions/", include("questions.urls")),
 ]
 
 
