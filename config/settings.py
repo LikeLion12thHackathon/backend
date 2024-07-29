@@ -26,7 +26,7 @@ SECRET_KEY = os.environ.get(
     "SECRET_KEY", "django-insecure-@1qxu_lkqvx0m1##&+gu+-&=7(52n*=$wd)3vcs(kc7u4j$-f#"
 )
 
-OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY","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")
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY","")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get("DEBUG", 1))
