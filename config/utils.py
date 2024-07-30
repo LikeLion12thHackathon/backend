@@ -1,3 +1,4 @@
+import logging
 from rest_framework.views import exception_handler
 from rest_framework.response import Response
 from rest_framework import status
@@ -19,6 +20,33 @@ from config.enum.success_code import SuccessCode
 
 ################# 클라이언트 에러 응답 ################
 
+
+logger = logging.getLogger(__name__)
+
+def handle_exception(response, status_code, code, message):
+    logger.error(f"Error: {message}, Status Code: {status_code}")
+    response.data = {
+        "successFlag": False,
+        "code": code,
+        "message": message,
+        "length": 0,
+        "data": None,
+    }
+    response.status_code = status_code
+    return response
+
+def handle_generic_error():
+    logger.error("Unhandled server error")
+    return Response(
+        {
+            "successFlag": False,
+            "code": ErrorCode.COMMON_004.code,
+            "message": ErrorCode.COMMON_004.message,
+            "length": 0,
+            "data": None,
+        },
+        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+    )
 
 def custom_exception_handler(exc, context):
     # DRF의 기본 예외 처리기를 호출
@@ -94,33 +122,6 @@ def custom_exception_handler(exc, context):
     else:
         response = handle_generic_error()
     return response
-
-
-def handle_exception(response, status_code, code, message):
-    response.data = {
-        "successFlag": False,
-        "code": code,
-        "message": message,
-        "length": 0,
-        "data": None,
-    }
-    response.status_code = status_code
-    return response
-
-
-# 기타 서버 예외
-def handle_generic_error():
-    return Response(
-        {
-            "successFlag": False,
-            "code": ErrorCode.COMMON_004.code,
-            "message": ErrorCode.COMMON_004.message,
-            "length": 0,
-            "data": None,
-        },
-        status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    )
-
 
 ################ API 응답을 일관된 형식으로 반환하는 유틸리티 클래스 ################
 
