@@ -5,7 +5,7 @@ if ! [ -x "$(command -v docker-compose)" ]; then
   exit 1
 fi
 
-domains=(gpt-doctor.o-r.kr)
+domains=(gpt-doctor.n-e.kr)
 rsa_key_size=4096
 data_path="./data/certbot"
 email="qzqzcaraz@naver.com" # Adding a valid address is strongly recommended

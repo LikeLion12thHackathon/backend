@@ -129,7 +129,7 @@ CORS_ALLOW_HEADERS = (
 )
 
 # CSRF 설정
-CSRF_TRUSTED_ORIGINS = ["http://gpt-doctor.o-r.kr", "https://gpt-doctor.o-r.kr"]
+CSRF_TRUSTED_ORIGINS = ["http://gpt-doctor.n-e.kr", "https://gpt-doctor.n-e.kr"]
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
